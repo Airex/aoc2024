@@ -15,6 +15,9 @@ module Pair =
 
     let uncurry (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
 
+    let add (a, b) (c, d) = (a + c, b + d)
+    let scale factor (a, b) = (a * factor, b * factor)
+
 
 module String =
     let split (d: string) (x: string) =
@@ -34,13 +37,15 @@ module Combinators =
 
 module Array2D =
     let sum (arr: _ array2d) =
-        let mutable sum = 0
+        let rec sumHelper i j acc =
+            if i >= Array2D.length1 arr then
+                acc
+            elif j >= Array2D.length2 arr then
+                sumHelper (i + 1) 0 acc
+            else
+                sumHelper i (j + 1) (acc + arr.[i, j])
 
-        for i in 0 .. (Array2D.length1 arr - 1) do
-            for j in 0 .. (Array2D.length2 arr - 1) do
-                sum <- sum + arr[i, j]
-
-        sum
+        sumHelper 0 0 0
 
     let inBounds (arr: _ array2d) x y =
         x >= 0
@@ -48,10 +53,20 @@ module Array2D =
         && x < Array2D.length1 arr
         && y < Array2D.length2 arr
 
-    let windowFold (f: 's * 'b -> 's) (state: 's) (window: int * int) (arr: _ array2d) =
-        let mutable s = state
 
-        for i in 0 .. (Array2D.length1 arr - 1 - fst window - 1) do
-            for j in 0 .. (Array2D.length2 arr - 1 - snd window - 1) do
-                s <- f (s, (arr, i, j, i + fst window, j + snd window))
-        s
+
+    let windowFold
+        (f: 's -> _ array2d * _ * _ * _ * _ -> 's)
+        (state: 's)
+        (window: _ * _)
+        (arr: _ array2d)
+        =
+        let rec foldHelper i j s =
+            if i > Array2D.length1 arr - fst window then
+                s
+            else if j > Array2D.length2 arr - snd window then
+                foldHelper (i + 1) 0 s
+            else
+                foldHelper i (j + 1) (f s (arr, i, j, i + fst window - 1, j + snd window - 1))
+
+        foldHelper 0 0 state

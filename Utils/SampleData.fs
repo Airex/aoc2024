@@ -6,6 +6,17 @@ module SampleData =
 
     let loadSampleData filePath = File.ReadAllText filePath
 
+    let run solutions data =
+        let stopwatch = System.Diagnostics.Stopwatch.StartNew()
+
+        let measureSolution data i solution =
+            stopwatch.Restart()
+            let result = solution data
+            stopwatch.Stop()
+            printfn $"Result {i + 1 }: {result}, Elapsed: {stopwatch.ElapsedTicks}ticks"
+
+        solutions |> List.iteri (measureSolution data)
+
     let dump a =
         printfn $"{a}"
         a

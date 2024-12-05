@@ -45,13 +45,4 @@ let data =
     loadSampleData "E:\\Sources\\experiments\\advent of code\\2024\\AdventOfCode2024\\Day2\\Puzzle1.txt"
     |> readLines
 
-let stopwatch = System.Diagnostics.Stopwatch.StartNew()
-let result1 = solution1 data
-stopwatch.Stop()
-
-printfn $"Result 1: {result1}, Elapsed: {stopwatch.ElapsedMilliseconds}ms"
-
-stopwatch.Restart()
-let result2 = solution2 data
-stopwatch.Stop()
-printfn $"Result 2: {result2}, Elapsed: {stopwatch.ElapsedMilliseconds}ms"
+run [solution1; solution2] data

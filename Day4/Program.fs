@@ -10,29 +10,30 @@ let readLines =
 
 let dirs = [|(1,0); (1,1); (0,1); (-1,1); (-1,0); (-1,-1); (0,-1); (1,-1)|]
 
-let checkMask word (field: char array2d) pos dir =
+let checkMask word (grid: char array2d) pos dir =
     let step i c =
-        let x, y = ((fst pos) + ((fst dir) * i), (snd pos) + ((snd dir) * i))
-        match Array2D.inBounds field x y with
+        let x, y = pos |> Pair.add (dir |> Pair.scale i)
+        match Array2D.inBounds grid x y with
         | false -> false
-        | true -> field.[x, y] = c
+        | true -> grid.[x, y] = c
 
     word
     |> Seq.mapi step
     |> Seq.forall id
 
-let countDirections field pos =
+let countDirections grid pos =
     dirs
-    |> Array.sumBy ((checkMask "XMAS" field pos) >> zeroOne)
+    |> Array.sumBy ((checkMask "XMAS" grid pos) >> zeroOne)
 
-let checkMas field pos =
+let checkMas grid pos =
     [
-        checkMask "MAS" field pos (1, 1);
-        checkMask "SAM" field pos (1, 1);
-        checkMask "MAS" field (pos |> Pair.fmap2 ((+) 2, id) (-1, 1);
-        checkMask "SAM" field (fst pos + 2, snd pos) (-1, 1)
+        checkMask "MAS" grid pos (1, 1);
+        checkMask "SAM" grid pos (1, 1);
+        checkMask "MAS" grid (pos |> Pair.fmap2 ((+) 2, id)) (-1, 1);
+        checkMask "SAM" grid (pos |> Pair.fmap2 ((+) 2, id)) (-1, 1)
     ]
     |> List.sumBy zeroOne
+    |> (=) 2
 
 let solution1  data =
     data
@@ -41,21 +42,12 @@ let solution1  data =
 
 let solution2 data =
     data
-    |> Array2D.windowFold (fun (s, (arr, x1, y1, _, _)) ->
-        let count = checkMas arr (x1, y1)
-        s + (count = 2 |> zeroOne)
-    ) 0 (2, 2)
+    |> Array2D.windowFold (fun s (grid, x1, y1, _, _) ->
+       (x1 ,y1) |> checkMas grid |> zeroOne |> (+) s
+    ) 0 (3, 3)
 
 let data =
     loadSampleData "E:\\Sources\\experiments\\advent of code\\2024\\AdventOfCode2024\\Day4\\Puzzle2.txt"
     |> readLines
 
-let stopwatch = System.Diagnostics.Stopwatch.StartNew()
-let result1 = solution1 data
-stopwatch.Stop()
-printfn $"Result 1: {result1}, Elapsed: {stopwatch.ElapsedTicks}ticks"
-
-stopwatch.Restart()
-let result2 = solution2 data
-stopwatch.Stop()
-printfn $"Result 2: {result2}, Elapsed: {stopwatch.ElapsedTicks}ticks"
+run [solution1; solution2] data
