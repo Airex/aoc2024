@@ -17,6 +17,7 @@ module Pair =
     let branch (f: 'a -> 'b) (g: 'a -> 'c) (a: 'a) = (f a, g a)
     let add (a, b) (c, d) = (a + c, b + d)
     let scale factor (a, b) = (a * factor, b * factor)
+    let opposite = scale -1
 
 
 module String =
@@ -37,8 +38,39 @@ module Combinators =
     let S f g h x = f (g x) (h x)
     let K x _ = x
 
+type Dir =
+    | Unknown
+    | Up
+    | Down
+    | Left
+    | Right
+
+module Dir =
+    let charToDir =
+        function
+        | '^' -> Up
+        | 'v' -> Down
+        | '<' -> Left
+        | '>' -> Right
+        | _ -> raise (System.Exception("Invalid direction"))
+
+    let rotateRight =
+        function
+        | Up -> Right
+        | Right -> Down
+        | Down -> Left
+        | Left -> Up
+
+    let dirToPair =
+        function
+        | Up -> (-1, 0)
+        | Down -> (1, 0)
+        | Left -> (0, -1)
+        | Right -> (0, 1)
+
 
 module Array2D =
+
     let sum (arr: _ array2d) =
         let rec sumHelper i j acc =
             if i >= Array2D.length1 arr then
@@ -94,3 +126,32 @@ module Array2D =
                 printHelper i (j + 1)
 
         printHelper 0 0
+
+    let collectDirs (x, y) acc (p, t) =
+        match (x, y) = p with
+        | true ->
+            match acc with
+            | Some x when
+                (x = char "|" || x = char " ")
+                && (t = Up || t = Down)
+                ->
+                Some '|'
+            | Some x when
+                (x = char "-" || x = char " ")
+                && (t = Left || t = Right)
+                ->
+                Some '-'
+            | Some x when x = char "|" && (t = Left || t = Right) -> Some '+'
+            | Some x when x = char "-" && (t = Up || t = Down) -> Some '+'
+            | Some x -> Some x
+            | None ->
+                if t = Up || t = Down then
+                    Some '|'
+                else
+                    Some '-'
+        | _ -> acc
+
+    let pathPrinter path get (_: _ array2d) (x, y) =
+        match (path |> Set.fold (collectDirs (x, y)) None) with
+        | Some x -> x
+        | _ -> get (x, y)

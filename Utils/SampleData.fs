@@ -15,7 +15,7 @@ module SampleData =
             stopwatch.Restart()
             let result = solution data
             stopwatch.Stop()
-            printfn $"Result {i + 1}: {result}, Elapsed: {stopwatch.ElapsedTicks}ticks"
+            printfn $"Result {i + 1}: {result}, Elapsed: {stopwatch.ElapsedMilliseconds} ms"
 
         solutions |> List.iteri (measureSolution data)
 
@@ -23,7 +23,7 @@ module SampleData =
         printfn $"%A{a}"
         a
 
-    let flip f x y = f y x
+    let inline flip f x y = f y x
 
 
     let boolToint x y =
