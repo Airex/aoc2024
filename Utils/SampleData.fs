@@ -6,6 +6,8 @@ module SampleData =
 
     let loadSampleData filePath = File.ReadAllText filePath
 
+    let loadSampleDataLines filePath = File.ReadAllLines filePath
+
     let run solutions data =
         let stopwatch = System.Diagnostics.Stopwatch.StartNew()
 
@@ -13,15 +15,21 @@ module SampleData =
             stopwatch.Restart()
             let result = solution data
             stopwatch.Stop()
-            printfn $"Result {i + 1 }: {result}, Elapsed: {stopwatch.ElapsedTicks}ticks"
+            printfn $"Result {i + 1}: {result}, Elapsed: {stopwatch.ElapsedTicks}ticks"
 
         solutions |> List.iteri (measureSolution data)
 
     let dump a =
-        printfn $"{a}"
+        printfn $"%A{a}"
         a
 
     let flip f x y = f y x
+
+
+    let boolToint x y =
+        function
+        | true -> x
+        | false -> y
 
     let zeroOne =
         function

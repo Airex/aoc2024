@@ -7,14 +7,14 @@ module Pair =
     let fromArray (a: 'a array) = (a.[0], a.[1])
     let fromList (a: 'a list) = (List.head a, List.head (List.tail a))
     let map (f: 'a -> 'b) (a: 'a * 'a) = (f (fst a), f (snd a))
-    let map2 (f: 'a -> 'b -> 'c) (a: 'a * 'a) (b: 'b * 'b) = (f (fst a) (fst b), f (snd a) (snd b))
+    let map2 (f: 'a -> 'b -> 'c) (g: 'a -> 'b -> 'd) (a: 'a * 'b) = f (fst a) (snd a), g (fst a) (snd a)
 
     let fmap2 (a: ('a -> 'c) * ('b -> 'd)) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
-
+    let fmap (f: 'a -> 'b -> 'c) (b: 'a * 'b) = f (fst b) (snd b)
     let swap (a: 'a * 'b) = (snd a, fst a)
-
     let uncurry (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
-
+    let curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)
+    let branch (f: 'a -> 'b) (g: 'a -> 'c) (a: 'a) = (f a, g a)
     let add (a, b) (c, d) = (a + c, b + d)
     let scale factor (a, b) = (a * factor, b * factor)
 
@@ -23,9 +23,11 @@ module String =
     let split (d: string) (x: string) =
         x.Split(d, StringSplitOptions.RemoveEmptyEntries)
 
+    let splitChars (d: char array) (x: string) = x.Split(d)
+
     let words = split " "
 
-    let splitLines = split ("\n")
+    let splitLines = splitChars [| '\n'; '\r' |]
 
     let matches patern input = Regex.Matches(input, patern)
 
@@ -33,6 +35,7 @@ module String =
 
 module Combinators =
     let S f g h x = f (g x) (h x)
+    let K x _ = x
 
 
 module Array2D =
@@ -47,6 +50,19 @@ module Array2D =
 
         sumHelper 0 0 0
 
+    let findIndex (f: _ -> bool) (arr: _ array2d) =
+        let rec findIndexHelper i j =
+            if i >= Array2D.length1 arr then
+                None
+            elif j >= Array2D.length2 arr then
+                findIndexHelper (i + 1) 0
+            elif f arr.[i, j] then
+                Some(i, j)
+            else
+                findIndexHelper i (j + 1)
+
+        findIndexHelper 0 0
+
     let inBounds (arr: _ array2d) x y =
         x >= 0
         && y >= 0
@@ -55,12 +71,7 @@ module Array2D =
 
 
 
-    let windowFold
-        (f: 's -> _ array2d * _ * _ * _ * _ -> 's)
-        (state: 's)
-        (window: _ * _)
-        (arr: _ array2d)
-        =
+    let windowFold (f: 's -> _ array2d * _ * _ * _ * _ -> 's) (state: 's) (window: _ * _) (arr: _ array2d) =
         let rec foldHelper i j s =
             if i > Array2D.length1 arr - fst window then
                 s
@@ -70,3 +81,16 @@ module Array2D =
                 foldHelper i (j + 1) (f s (arr, i, j, i + fst window - 1, j + snd window - 1))
 
         foldHelper 0 0 state
+
+    let print (arr: _ array2d) get =
+        let rec printHelper i j =
+            if i >= Array2D.length1 arr then
+                ()
+            elif j >= Array2D.length2 arr then
+                printfn ""
+                printHelper (i + 1) 0
+            else
+                printf $"{(get arr (i, j))}"
+                printHelper i (j + 1)
+
+        printHelper 0 0
