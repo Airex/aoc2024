@@ -34,7 +34,7 @@ let solution1 = solve false
 let solution2 = solve true
 
 let data =
-    loadSampleData "E:\\Sources\\experiments\\advent of code\\2024\\AdventOfCode2024\\Day3\\Puzzle1.txt"
+    loadSampleData "Puzzle1.txt"
 
 
 run [solution1; solution2] data

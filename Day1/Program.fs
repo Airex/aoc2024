@@ -38,7 +38,7 @@ let solution2 data=
     ||> flip Array.sumBy
 
 let data =
-    loadSampleData "E:\\Sources\\experiments\\advent of code\\2024\\AdventOfCode2024\\Day1\\Puzzle1.txt"
+    loadSampleData "Puzzle1.txt"
     |> readLines
 
 run [solution1; solution2] data

@@ -7,7 +7,7 @@
 
     <ItemGroup>
         <Compile Include="Program.fs"/>
-        <Content Include="Puzzle1.txt"/>
+        <Content Include="Puzzle1.txt" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 
     <ItemGroup>

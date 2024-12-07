@@ -165,7 +165,7 @@ let solution2_v3 data =
 
 
 let data =
-    loadSampleDataLines "E:\\Sources\\experiments\\advent of code\\2024\\AdventOfCode2024\\Day5\\Puzzle2.txt"
+    loadSampleDataLines "Puzzle2.txt"
     |> Array.fold
         (fun acc v ->
             match v with

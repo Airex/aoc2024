@@ -42,7 +42,7 @@ let solution2 data =
 
 
 let data =
-    loadSampleData "E:\\Sources\\experiments\\advent of code\\2024\\AdventOfCode2024\\Day2\\Puzzle1.txt"
+    loadSampleData "Puzzle1.txt"
     |> readLines
 
 run [solution1; solution2] data

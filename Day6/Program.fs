@@ -35,18 +35,16 @@ let rec stepper (inBounds, get) pos dir visited cyclesCount =
             | _ -> stepper (inBounds, get) (pos |> stepBack dir ) (dir |> rotateRight) visited cyclesCount
 
 let solution1 data =
+    let inBounds, get = data |> api
     let start = data |> findIndex isGuard |> Option.defaultValue (-1, -1)
     let dir = charToDir ((uncurry (Array2D.get data)) start)
-    let inBounds = uncurry (Array2D.inBounds data)
-    let get = uncurry (Array2D.get data)
 
     let _, path, _ = stepper (inBounds, get) start dir HashSet.empty -1
     let p1 = path |> HashSet.fold (fun acc x -> x |> fst |> flip HashSet.add acc) HashSet.empty |> HashSet.count
     p1
 
 let solution2 data =
-    let inBounds = uncurry (Array2D.inBounds data)
-    let get = uncurry (Array2D.get data)
+    let inBounds, get = data |> api
     let start = data |> findIndex isGuard |> Option.defaultValue (-1, -1)
     let dir = start |> get |> charToDir
     let _, _, cycled = stepper (inBounds, get) start dir HashSet.empty 0
@@ -54,7 +52,7 @@ let solution2 data =
 
 
 let data =
-    loadSampleDataLines "E:\\Sources\\experiments\\advent of code\\2024\\AdventOfCode2024\\Day6\\Puzzle2.txt"
+    loadSampleDataLines "Puzzle1.txt"
     |> Array.filter (_.Length >> (<) 0) // Rider adds extra empty line at the end of the file
     |> array2D
 

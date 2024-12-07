@@ -101,8 +101,6 @@ module Array2D =
         && x < Array2D.length1 arr
         && y < Array2D.length2 arr
 
-
-
     let windowFold (f: 's -> _ array2d * _ * _ * _ * _ -> 's) (state: 's) (window: _ * _) (arr: _ array2d) =
         let rec foldHelper i j s =
             if i > Array2D.length1 arr - fst window then
@@ -155,3 +153,6 @@ module Array2D =
         match (path |> Set.fold (collectDirs (x, y)) None) with
         | Some x -> x
         | _ -> get (x, y)
+
+    let api grid =
+        (Pair.uncurry (inBounds grid), Pair.uncurry (Array2D.get grid))

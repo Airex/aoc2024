@@ -7,8 +7,8 @@
 
     <ItemGroup>
         <Compile Include="Program.fs"/>
-        <Content Include="Puzzle1.txt"/>
-        <Content Include="Puzzle2.txt"/>
+        <Content Include="Puzzle1.txt" CopyToOutputDirectory="Always"/>
+        <Content Include="Puzzle2.txt" CopyToOutputDirectory="Always"/>
     </ItemGroup>
 
     <ItemGroup>

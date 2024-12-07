@@ -1,23 +1,29 @@
 ﻿namespace Utils
 
 open System.IO
+open System.Reflection
 
 module SampleData =
 
     let loadSampleData filePath = File.ReadAllText filePath
 
-    let loadSampleDataLines filePath = File.ReadAllLines filePath
+    let loadSampleDataLines filePath =
+        Path.Join(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), filePath)
+        |> File.ReadAllLines
 
     let run solutions data =
-        let stopwatch = System.Diagnostics.Stopwatch.StartNew()
+        match solutions |> List.length with
+        | 0 -> printfn "No solutions provided"
+        | _ ->
+            let stopwatch = System.Diagnostics.Stopwatch.StartNew()
 
-        let measureSolution data i solution =
-            stopwatch.Restart()
-            let result = solution data
-            stopwatch.Stop()
-            printfn $"Result {i + 1}: {result}, Elapsed: {stopwatch.ElapsedMilliseconds} ms"
+            let measureSolution data i solution =
+                stopwatch.Restart()
+                let result = solution data
+                stopwatch.Stop()
+                printfn $"Result {i + 1}: {result}, Elapsed: {stopwatch.ElapsedMilliseconds} ms"
 
-        solutions |> List.iteri (measureSolution data)
+            solutions |> List.iteri (measureSolution data)
 
     let dump a =
         printfn $"%A{a}"
