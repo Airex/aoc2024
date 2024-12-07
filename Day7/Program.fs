@@ -8,6 +8,7 @@ open Utils.String
 let checkops ops (target, parts) =
     let rec tryOperators' parts acc =
         match parts with
+        | _ when acc > target -> false
         | [] -> target = acc
         | x :: xs -> ops |> List.exists ( (|>) acc >> (|>) x >> tryOperators' xs)
 
