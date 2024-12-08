@@ -156,3 +156,30 @@ module Array2D =
 
     let api grid =
         (Pair.uncurry (inBounds grid), Pair.uncurry (Array2D.get grid))
+
+
+module Permutations =
+   let permutations k (list: 'T list) =
+    let n = list.Length
+    seq {
+        // Start with the first "number" in base-n of k digits (all zeros)
+        let indices = Array.create k 0
+        let mutable finished = false
+
+        while not finished do
+            // Yield the current permutation based on indices
+            yield indices |> Array.map (fun idx -> list.[idx])
+
+            // Increment the indices array as a base-n counter
+            let mutable carry = true
+            for pos in k - 1 .. -1 .. 0 do
+                if carry then
+                    indices.[pos] <- indices.[pos] + 1
+                    if indices.[pos] = n then
+                        indices.[pos] <- 0
+                        carry <- true // Carry to the next digit
+                    else
+                        carry <- false // No carry needed
+            if carry then
+                finished <- true // Overflow past the highest value, terminate
+    }

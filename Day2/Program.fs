@@ -23,12 +23,9 @@ let safeCondition arr =
 
     withinRange && (positiveCount = 0 || negativeCount = 0)
 
-let pairwiseDiff = Array.pairwise >> Array.map (uncurry (-))
-let conditionMatcher = pairwiseDiff >> safeCondition
-
+let conditionMatcher = Array.pairwise >> Array.map (uncurry (-)) >> safeCondition
 let solution1 data =
     data |> Array.sumBy (conditionMatcher >> zeroOne)
-
 let solution2 data =
     let flippedRemoveAt = flip Array.removeAt
 
@@ -39,8 +36,6 @@ let solution2 data =
 
     data
     |> Array.sumBy (withOneErrorConditionMatcher >> zeroOne)
-
-
 let data =
     loadSampleData "Puzzle1.txt"
     |> readLines

@@ -22,7 +22,9 @@ let solution1 data =
     data |> Array.sumBy ( S (*) fst (checkops basicOps >> zeroOne >> int64) )
 
 let solution2 data =
-    let (<||>) x y = string x + string y |> int64
+    let (<||>) x y =
+        let yDigits = if y = 0L then 1 else int (log10 (float y))  + 1
+        x * int64 (pown 10L yDigits) + y
     data |> Array.sumBy ( S (*) fst (checkops ((<||>) :: basicOps) >> zeroOne >> int64) )
 
 let data =

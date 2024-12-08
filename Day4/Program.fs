@@ -54,3 +54,20 @@ let data =
     |> readLines
 
 run [solution1; solution2] data
+
+let  permutations len lst  =
+    let rec permute len lst =
+        match len with
+        | 0 -> [[]]
+        | _ -> lst |> List.collect (fun x -> permute (len - 1) lst |> List.map (fun y -> x :: y))
+    permute len lst
+
+type Op = Add | Multiply
+let t = permutations 5 [Add; Multiply] |> Seq.toArray |> Array.iter (printfn "%A")
+
+
+let rec generateOperators (count: int) operations =
+    if count = 0 then [[]]
+    else
+        let rest = generateOperators (count - 1)
+        List.collect (fun ops -> [ "+" :: ops; "*" :: ops ]) rest
