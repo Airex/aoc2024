@@ -10,33 +10,25 @@ let format arr =
     |> String.concat ""
     |> dump
 
-let fillGaps arr =
+let fillGaps input =
+    let mutable arr = input
     let mutable left = 0
     let mutable right = Array.length arr - 1
 
-    while left <> right do
-        match arr[left] with
-        | Some _ -> left <- left + 1
-        | None ->
-            match arr[right] with
-            | None -> right <- right - 1
-            | Some r ->
-                arr.[left] <- Some r
-                arr.[right] <- None
-                left <- left + 1
-                right <- right - 1
+    while right <> left do
+        match arr[right] with
+        | Empty _ -> right <- right - 1
+        | File (fsize, index) ->
+            match arr[left] with
+            | Empty esize ->
+                arr[right] <- if fsize - esize > 0 then File (fsize - esize, index) else Empty 0
+                arr.[left] <- File (min esize fsize, index)
+                left <- if fsize - esize >= 0 then left + 1 else left
+                right <- if fsize - esize > 0 then right else right - 1
+                if fsize - esize < 0 then
+                    arr <- arr  |> Array.insertAt (left+1) (Empty (esize-fsize)) // Insert the gap
+            | _ -> left <- left + 1 // Move left
     arr
-
-let solution1 data =
-    data
-    |> Array.ofSeq
-    |> Array.map (string >>int)
-    |> Array.indexed
-    |> Array.collect (fun (i, c) -> Array.init c (fun _ -> if i%2 = 0 then Some (i/2) else None ))
-    |> fillGaps
-    |> Seq.choose id
-    |> Seq.indexed
-    |> Seq.sumBy (fun (i, c) -> int64 i * int64 c)
 
 let fillGapsClusters input =
     let mutable arr = input
@@ -61,18 +53,21 @@ let fillGapsClusters input =
             | _ -> left <- left + 1 // Move left
     arr
 
-let solution2 data =
+let solve gapFiller data =
     data
     |> Array.ofSeq
     |> Array.map (string >> int)
     |> Array.mapi (fun i c ->  if i % 2 = 0 then File (c, (i/2)) else Empty c )
-    |> fillGapsClusters
+    |> gapFiller
     |> Seq.collect (fun d ->
         match d with
         | File (fsize, index) -> Seq.init fsize (fun _ -> index)
         | Empty esize -> Seq.init esize (fun _ -> 0))
     |> Seq.indexed
     |> Seq.sumBy (fun (i, c) -> int64 i * int64 c)
+
+let solution1 = solve fillGaps
+let solution2 = solve fillGapsClusters
 
 let data =
     loadSampleData "Puzzle2.txt"
