@@ -8,9 +8,8 @@ module Pair =
     let fromList (a: 'a list) = (List.head a, List.head (List.tail a))
     let map (f: 'a -> 'b) (a: 'a * 'a) = (f (fst a), f (snd a))
     let map2 (f: 'a -> 'b -> 'c) (g: 'a -> 'b -> 'd) (a: 'a * 'b) = f (fst a) (snd a), g (fst a) (snd a)
-
     let fmap2 (a: ('a -> 'c) * ('b -> 'd)) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
-    let fmap (f: 'a -> 'b -> 'c) (b: 'a * 'b) = f (fst b) (snd b)
+    let fmap (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
     let swap (a: 'a * 'b) = (snd a, fst a)
     let uncurry (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
     let curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)

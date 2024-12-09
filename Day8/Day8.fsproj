@@ -19,4 +19,8 @@
       <ProjectReference Include="..\Utils\Utils.fsproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="BenchmarkDotNet" Version="0.14.0" />
+    </ItemGroup>
+
 </Project>
