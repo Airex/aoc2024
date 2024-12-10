@@ -1,6 +1,7 @@
 ﻿namespace Utils
 
 open System
+open System.Collections.Generic
 open System.Text.RegularExpressions
 
 module Pair =
@@ -15,6 +16,7 @@ module Pair =
     let curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)
     let branch (f: 'a -> 'b) (g: 'a -> 'c) (a: 'a) = (f a, g a)
     let add (a, b) (c, d) = (a + c, b + d)
+    let sub (a, b) (c, d) = (c - a,  d - b)
     let scale factor (a, b) = (a * factor, b * factor)
     let opposite = scale -1
 
@@ -156,6 +158,38 @@ module Array2D =
     let api grid =
         (Pair.uncurry (inBounds grid), Pair.uncurry (Array2D.get grid))
 
+
+// Generic BFS
+    let bfs (start: 'a) (stepFunc: 'a -> seq<'a>) (stopCondition: 'a -> bool) (process: 'a -> unit) =
+        let visited = HashSet<'a>()
+        let queue = Queue<'a>()
+        queue.Enqueue(start)
+        visited.Add(start) |> ignore
+
+        while queue.Count > 0 do
+            let current = queue.Dequeue()
+            process current
+            if not (stopCondition current) then
+                for next in stepFunc current do
+                    if not (visited.Contains(next)) then
+                        queue.Enqueue(next)
+                        visited.Add(next) |> ignore
+
+    // Generic DFS
+    let dfs (start: 'a) (stepFunc: 'a -> seq<'a>) (stopCondition: 'a -> bool) (process: 'a -> unit) =
+        let visited = HashSet<'a>()
+        let stack = Stack<'a>()
+        stack.Push(start)
+        visited.Add(start) |> ignore
+
+        while stack.Count > 0 do
+            let current = stack.Pop()
+            process current
+            if not (stopCondition current) then
+                for next in stepFunc current do
+                    if not (visited.Contains(next)) then
+                        stack.Push(next)
+                        visited.Add(next) |> ignore
 
 module Permutations =
    let permutations k (list: 'T list) =
