@@ -5,7 +5,7 @@ open System.Collections.Generic
 open System.Text.RegularExpressions
 
 module Pair =
-    let fromArray (a: 'a array) = (a.[0], a.[1])
+    let fromArray (a: 'a array) = (a[0], a[1])
     let fromList (a: 'a list) = (List.head a, List.head (List.tail a))
     let map (f: 'a -> 'b) (a: 'a * 'a) = (f (fst a), f (snd a))
     let map2 (f: 'a -> 'b -> 'c) (g: 'a -> 'b -> 'd) (a: 'a * 'b) = f (fst a) (snd a), g (fst a) (snd a)
@@ -16,7 +16,7 @@ module Pair =
     let curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)
     let branch (f: 'a -> 'b) (g: 'a -> 'c) (a: 'a) = (f a, g a)
     let add (a, b) (c, d) = (a + c, b + d)
-    let sub (a, b) (c, d) = (c - a,  d - b)
+    let sub (a, b) (c, d) = (c - a, d - b)
     let scale factor (a, b) = (a * factor, b * factor)
     let opposite = scale -1
 
@@ -53,7 +53,7 @@ module Dir =
         | 'v' -> Down
         | '<' -> Left
         | '>' -> Right
-        | _ -> raise (System.Exception("Invalid direction"))
+        | _ -> raise (Exception("Invalid direction"))
 
     let rotateRight =
         function
@@ -61,6 +61,7 @@ module Dir =
         | Right -> Down
         | Down -> Left
         | Left -> Up
+        | _ -> failwith "todo"
 
     let dirToPair =
         function
@@ -68,6 +69,7 @@ module Dir =
         | Down -> (1, 0)
         | Left -> (0, -1)
         | Right -> (0, 1)
+        | _ -> failwith "todo"
 
 
 module Array2D =
@@ -79,7 +81,7 @@ module Array2D =
             elif j >= Array2D.length2 arr then
                 sumHelper (i + 1) 0 acc
             else
-                sumHelper i (j + 1) (acc + arr.[i, j])
+                sumHelper i (j + 1) (acc + arr[i, j])
 
         sumHelper 0 0 0
 
@@ -89,7 +91,7 @@ module Array2D =
                 None
             elif j >= Array2D.length2 arr then
                 findIndexHelper (i + 1) 0
-            elif f arr.[i, j] then
+            elif f arr[i, j] then
                 Some(i, j)
             else
                 findIndexHelper i (j + 1)
@@ -159,8 +161,8 @@ module Array2D =
         (Pair.uncurry (inBounds grid), Pair.uncurry (Array2D.get grid))
 
 
-// Generic BFS
-    let bfs (start: 'a) (stepFunc: 'a -> seq<'a>) (stopCondition: 'a -> bool) (process: 'a -> unit) =
+    // Generic BFS
+    let bfs (start: 'a) (stepFunc: 'a -> seq<'a>) (stopCondition: 'a -> bool) (aFunc: 'a -> unit) =
         let visited = HashSet<'a>()
         let queue = Queue<'a>()
         queue.Enqueue(start)
@@ -168,7 +170,8 @@ module Array2D =
 
         while queue.Count > 0 do
             let current = queue.Dequeue()
-            process current
+            aFunc current
+
             if not (stopCondition current) then
                 for next in stepFunc current do
                     if not (visited.Contains(next)) then
@@ -176,7 +179,7 @@ module Array2D =
                         visited.Add(next) |> ignore
 
     // Generic DFS
-    let dfs (start: 'a) (stepFunc: 'a -> seq<'a>) (stopCondition: 'a -> bool) (process: 'a -> unit) =
+    let dfs (start: 'a) (stepFunc: 'a -> seq<'a>) (stopCondition: 'a -> bool) (aFunc: 'a -> unit) =
         let visited = HashSet<'a>()
         let stack = Stack<'a>()
         stack.Push(start)
@@ -184,35 +187,86 @@ module Array2D =
 
         while stack.Count > 0 do
             let current = stack.Pop()
-            process current
+            aFunc current
+
             if not (stopCondition current) then
                 for next in stepFunc current do
                     if not (visited.Contains(next)) then
                         stack.Push(next)
                         visited.Add(next) |> ignore
 
+    let bfs2 (start: 'a) (stepFunc: 'a -> seq<'a>) (stopCondition: 'a -> bool) (processFn: 'a -> unit) =
+        let rec loop queue visited =
+            match queue with
+            | [] -> () // Base case: no more nodes to process
+            | current :: rest ->
+                processFn current
+
+                if not (stopCondition current) then
+                    // Generate the next steps
+                    let nextSteps =
+                        stepFunc current
+                        |> Seq.filter (fun next -> not (visited |> Set.contains next))
+                        |> Seq.toList
+
+                    // Add unvisited nodes to the queue and mark them as visited
+                    let newQueue = rest @ nextSteps
+                    let newVisited = visited + (Set.ofList nextSteps)
+                    loop newQueue newVisited
+                else
+                    // Continue processing the remaining nodes
+                    loop rest visited
+
+        // Initialize the loop with the start node
+        loop [ start ] (Set.singleton start)
+
+
+    let dfs2 start stepFunc stopCondition aFunc =
+        let rec dfs2_ current stepFunc stopCondition func visited =
+        // Process the current node
+            func current
+
+            // Stop if the stop condition is met
+            if not (stopCondition current) then
+                // Recursively visit all unvisited neighbors
+                stepFunc current
+                |> Seq.filter (fun next -> not (visited |> Set.contains next))
+                |> Seq.fold
+                    (fun acc next ->
+                        dfs2_ next stepFunc stopCondition func (visited |> Set.add next)
+                        acc // Fold result is ignored as we only process the nodes
+                        )
+                    ()
+            else
+                () // Stop recursion when stop condition is met
+
+        dfs2_ start stepFunc stopCondition aFunc (Set.singleton start)
+
 module Permutations =
-   let permutations k (list: 'T list) =
-    let n = list.Length
-    seq {
-        // Start with the first "number" in base-n of k digits (all zeros)
-        let indices = Array.create k 0
-        let mutable finished = false
+    let permutations k (list: 'T list) =
+        let n = list.Length
 
-        while not finished do
-            // Yield the current permutation based on indices
-            yield indices |> Array.map (fun idx -> list.[idx])
+        seq {
+            // Start with the first "number" in base-n of k digits (all zeros)
+            let indices = Array.create k 0
+            let mutable finished = false
 
-            // Increment the indices array as a base-n counter
-            let mutable carry = true
-            for pos in k - 1 .. -1 .. 0 do
-                if carry then
-                    indices.[pos] <- indices.[pos] + 1
-                    if indices.[pos] = n then
-                        indices.[pos] <- 0
-                        carry <- true // Carry to the next digit
-                    else
-                        carry <- false // No carry needed
-            if carry then
-                finished <- true // Overflow past the highest value, terminate
-    }
+            while not finished do
+                // Yield the current permutation based on indices
+                yield indices |> Array.map (fun idx -> list[idx])
+
+                // Increment the indices array as a base-n counter
+                let mutable carry = true
+
+                for pos in k - 1 .. -1 .. 0 do
+                    if carry then
+                        indices[pos] <- indices[pos] + 1
+
+                        if indices[pos] = n then
+                            indices[pos] <- 0
+                            carry <- true // Carry to the next digit
+                        else
+                            carry <- false // No carry needed
+
+                if carry then finished <- true // Overflow past the highest value, terminate
+        }
