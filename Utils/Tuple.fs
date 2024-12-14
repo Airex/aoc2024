@@ -7,11 +7,15 @@ open System.Text.RegularExpressions
 module Pair =
     let fromArray (a: 'a array) = (a[0], a[1])
     let fromList (a: 'a list) = (List.head a, List.head (List.tail a))
+
+    let makePair (a: 'a) = (a, a)
     let map (f: 'a -> 'b) (a: 'a * 'a) = (f (fst a), f (snd a))
     let map2 (f: 'a -> 'b -> 'c) (g: 'a -> 'b -> 'd) (a: 'a * 'b) = f (fst a) (snd a), g (fst a) (snd a)
     let fmap2 (a: ('a -> 'c) * ('b -> 'd)) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
     let fmap (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
     let swap (a: 'a * 'b) = (snd a, fst a)
+    let apply (a: 'c * 'd) (b: 'a * 'b) = ((fst b) (fst a), (snd b) (snd a))
+    let (<*>) (a: 'c * 'd) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
     let uncurry (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
     let curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)
     let branch (f: 'a -> 'b) (g: 'a -> 'c) (a: 'a) = (f a, g a)

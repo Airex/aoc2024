@@ -1,7 +1,6 @@
 ﻿module Day7
 
 open Utils.Combinators
-open Utils.Pair
 open Utils.SampleData
 open Utils.String
 
