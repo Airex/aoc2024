@@ -49,7 +49,39 @@ let specialSort dir arr =
     | 0, -1 -> arr |> List.sortBy snd
     | _ -> arr
 
-let moveRobot collector pos moves (map: _ array2d) get =
+let collectBoxes get pos dir =
+    let addBox pos boxes =
+        match boxes with
+        | Some x -> Some(pos :: x)
+        | None -> Some [ pos ]
+
+    let rec f pending boxes visited =
+        match pending with
+        | [] -> boxes
+        | pos :: rest ->
+            if visited |> Set.contains pos then
+                f rest boxes visited
+            else
+                match get pos with
+                | OpenSpace -> f rest boxes visited
+                | Wall -> None
+                | Box -> f ((pos |> add dir) :: rest) (addBox pos boxes) visited
+                | LargeBoxRight ->
+                    f ((pos |> add (0, -1)) :: (pos |> add dir) :: rest) (addBox pos boxes) (visited |> Set.add pos)
+                | LargeBoxLeft ->
+                    f ((pos |> add (0, 1)) :: (pos |> add dir) :: rest) (addBox pos boxes) (visited |> Set.add pos)
+
+    f [ pos ] None Set.empty
+
+let moveRobot pos moves (map: _ array2d) get =
+    let moveBoxes dir boxes =
+        boxes
+        |> specialSort dir
+        |> List.iter (fun (x, y) ->
+            let nx, ny = (x, y) |> add dir
+            map[nx, ny] <- map[x, y]
+            map[x, y] <- '.')
+
     let rec f pos moves =
         match moves with
         | [] -> map
@@ -63,21 +95,15 @@ let moveRobot collector pos moves (map: _ array2d) get =
             | Box
             | LargeBoxLeft
             | LargeBoxRight ->
-                match collector get nextPos dir with
+                match collectBoxes get nextPos dir with
                 | None -> f pos rest
                 | Some boxes ->
-                    boxes
-                    |> specialSort dir
-                    |> List.iter (fun (x, y) ->
-                        let nx, ny = (x, y) |> add dir
-                        map[nx, ny] <- map[x, y]
-                        map[x, y] <- '.')
-
+                    moveBoxes dir boxes
                     f nextPos rest
 
     f pos moves
 
-let solve mapPatch collector scorer data =
+let solve mapPatch scorer data =
     let map, moves = data |> toMapAndMoves mapPatch
     let _, get = map |> api
 
@@ -88,43 +114,8 @@ let solve mapPatch collector scorer data =
 
     map[fst start, snd start] <- '.'
 
-    moveRobot collector start moves map get
+    moveRobot start moves map get
     |> score scorer
-
-let collectSmallBoxes get pos dir =
-    let rec f pos boxes =
-        match get pos with
-        | OpenSpace -> Some boxes
-        | Wall -> None
-        | Box -> f (pos |> add dir) (pos :: boxes)
-        | LargeBoxLeft
-        | LargeBoxRight -> failwith "Invalid state"
-
-    f pos []
-
-let collectLargeBoxes get pos dir =
-    let addBox pos boxes =
-        match boxes with
-        | Some x -> Some(pos :: x)
-        | None -> Some [ pos ]
-
-    let rec f toProcess boxes visited =
-        match toProcess with
-        | [] -> boxes
-        | pos :: rest ->
-            if visited |> Set.contains pos then
-                f rest boxes visited
-            else
-                match get pos with
-                | OpenSpace -> f rest boxes visited
-                | Wall -> None
-                | Box -> failwith "Invalid state"
-                | LargeBoxRight ->
-                    f ((pos |> add (0, -1)) :: (pos |> add dir) :: rest) (addBox pos boxes) (visited |> Set.add pos)
-                | LargeBoxLeft ->
-                    f ((pos |> add (0, 1)) :: (pos |> add dir) :: rest) (addBox pos boxes) (visited |> Set.add pos)
-
-    f [ pos ] None Set.empty
 
 let scaleMap line =
     line
@@ -138,8 +129,8 @@ let scaleMap line =
     |> List.rev
     |> List.toArray
 
-let solution1 = solve id collectSmallBoxes box
-let solution2 = solve (Array.map scaleMap) collectLargeBoxes largeBoxLeft
+let solution1 = solve id box
+let solution2 = solve (Array.map scaleMap) largeBoxLeft
 
 loadSampleDataLines "Puzzle2.txt"
 |> Array.fold
