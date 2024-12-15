@@ -16,11 +16,11 @@ with
         line
         |> split " "
         |> fromArray
-        |> fmap2 (makePair parsePair)
+        |> map parsePair
         |> fun (pos, dir) -> { Pos = pos; Dir = dir }
 
     member this.DoSteps steps field =
-        (makePair step) <*> this.Dir <*> field <*> (makePair steps) <*> this.Pos
+        this.Dir <*>> (makePair step)  <*> field <**> steps <*> this.Pos
 
 let calculateSteps steps field data =
     data
@@ -29,8 +29,15 @@ let calculateSteps steps field data =
 let solution1 data =
     let field = (101, 103)
     let steps = 100
-    let quadrant (x, y) = (x * 2 / ((fst field) + 1), y * 2 / ((snd field) + 1))
-    let notMidleLines (x, y) = x <> (fst field) / 2 && y <> (snd field) / 2
+    let quadrant =
+        field
+        |> map ((+) 1 >> flip (/) 2 >> flip (/) )
+        |> fmap2
+
+    let notMidleLines =
+        field
+        |> map (flip (/) 2 >> (<>))
+        |> fapply (&&)
 
     data
     |> calculateSteps steps field

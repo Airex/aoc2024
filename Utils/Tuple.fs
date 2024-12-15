@@ -15,7 +15,13 @@ module Pair =
     let fmap (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
     let swap (a: 'a * 'b) = (snd a, fst a)
     let apply (a: 'c * 'd) (b: 'a * 'b) = ((fst b) (fst a), (snd b) (snd a))
+    let fapply (a: 'c -> 'd) (b: 'a * 'b) (c: 'e * 'f) = a ((fst b) (fst c)) ((snd b) (snd c))
     let (<*>) (a: 'c * 'd) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
+    let (<**>) (a: 'c * 'd) (b: 'a) = ((fst a) b, (snd a) b)
+    let (<*>>) (a: 'c * 'd) (b: 'a * 'b) = ((fst b) (fst a), (snd b) (snd a))
+
+    let (<**>>) (a: 'c * 'd) (b: 'a ) = ((fst b) (a), (snd b) (a))
+
     let uncurry (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
     let curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)
     let branch (f: 'a -> 'b) (g: 'a -> 'c) (a: 'a) = (f a, g a)
@@ -42,6 +48,11 @@ module String =
 module Combinators =
     let S f g h x = f (g x) (h x)
     let K x _ = x
+    let C f x y = f y x
+    let B f g x = f (g x)
+    let W f x = f x x
+    let I x = x
+    let T x y = y x
 
 type Dir =
     | Unknown
@@ -67,6 +78,22 @@ module Dir =
         | Left -> Up
         | _ -> failwith "todo"
 
+    let rotateLeft =
+        function
+        | Up -> Left
+        | Left -> Down
+        | Down -> Right
+        | Right -> Up
+        | _ -> failwith "todo"
+
+    let opposite =
+        function
+        | Up -> Down
+        | Down -> Up
+        | Left -> Right
+        | Right -> Left
+        | _ -> failwith "todo"
+
     let dirToPair =
         function
         | Up -> (-1, 0)
@@ -77,7 +104,6 @@ module Dir =
 
 
 module Array2D =
-
     let sum (arr: _ array2d) =
         let rec sumHelper i j acc =
             if i >= Array2D.length1 arr then
@@ -118,6 +144,23 @@ module Array2D =
                 foldHelper i (j + 1) (f s (arr, i, j, i + fst window - 1, j + snd window - 1))
 
         foldHelper 0 0 state
+
+    let windowContains (m: _ array2d) (arr: _ array2d) =
+        let w, h = Array2D.length1 m, Array2D.length2 m
+        let aw, ah = Array2D.length1 arr, Array2D.length2 arr
+
+        let rec containsHelper i j =
+            if i > aw - w then
+                false
+            elif j > ah - h then
+                containsHelper (i + 1) 0
+            elif arr.[i .. i + w, j .. j + h] = m then
+                true
+            else
+                containsHelper i (j + 1)
+
+        containsHelper 0 0
+
 
     let print (arr: _ array2d) get =
         let rec printHelper i j =
@@ -227,7 +270,7 @@ module Array2D =
 
     let dfs2 start stepFunc stopCondition aFunc =
         let rec dfs2_ current stepFunc stopCondition func visited =
-        // Process the current node
+            // Process the current node
             func current
 
             // Stop if the stop condition is met
