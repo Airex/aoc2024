@@ -10,17 +10,9 @@ open Utils.SampleData
 let start c = c = 'S'
 let finish c = c = 'E'
 let wall c = c = '#'
-let empty c = c = '.'
-
-let (|Wall|Empty|Finish|)  = function
-    | c when wall c -> Wall
-    | c when empty c -> Empty
-    | c when start c -> Empty
-    | c when finish c -> Finish
-    | _ -> failwith "Invalid character"
 
 let aStarOnMap (map: char array2d) start goal goalReached =
-    let isValid (x, y, _) = map.[x, y] <> '#'
+    let isValid (x, y, _) = not (wall map[x, y])
 
     let neighbors (x, y, dir) =
         [ Dir.Right; Dir.Left; Dir.Down; Dir.Up ]
