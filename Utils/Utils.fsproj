@@ -7,6 +7,7 @@
     <ItemGroup>
         <Compile Include="SampleData.fs"/>
         <Compile Include="Tuple.fs"/>
+        <Compile Include="Navigation.fs" />
     </ItemGroup>
 
 </Project>
