@@ -19,27 +19,25 @@ let aStarOnMap (map: char array2d) start goal goalReached =
         |> List.map (fun d ->
             let pos = d |> dirToPair |> add (x, y)
             fst pos, snd pos, d
-        ) // Uniform cost of 1.0
+        )
         |> List.filter isValid
-        |> List.map (fun (x,y,d) -> (x,y,d), if d = dir then 1.0 else 1001.0) // Uniform cost of 1.0
+        |> List.map (fun (x,y,d) -> (x,y,d), if d = dir then 1.0 else 1001.0)
 
     let noHeuristics _ _ = 0.0
     aStar start goal goalReached neighbors noHeuristics
 
 let solve processResult data =
-    let start = data |> findIndex start |> Option.defaultValue (-1, -1)
-    let finish = data |> findIndex finish |> Option.defaultValue (-1, -1)
+    let start = data |> findIndex start |> Option.defaultValue (-1, -1) |> expand Dir.Right
+    let goal = data |> findIndex finish |> Option.defaultValue (-1, -1) |> expand Dir.Unknown
 
-    let startWithDir = (fst start, snd start, Dir.Right)
-    let goal = (fst finish, snd finish, Dir.Unknown)
     let goalReached (x, y, _) (gx, gy, _) = x = gx && y = gy
 
-    match aStarOnMap data startWithDir goal goalReached with
+    match aStarOnMap data start goal goalReached with
     | Some paths -> paths |> processResult
     | None -> failwith "No paths found"
 
-let solution1 =  solve (snd >> int)
-let solution2  = solve (fst >> List.collect id >> List.map (fun (x, y, _) -> x, y) >> List.distinct >> List.length)
+let solution1 = solve (snd >> int)
+let solution2 = solve (fst >> List.collect id >> List.map (fun (x, y, _) -> x, y) >> List.distinct >> List.length)
 
 loadSampleDataLines "Puzzle2.txt"
 |> Array.filter (_.Length >> (<) 0)

@@ -29,6 +29,7 @@ module Pair =
     let sub (a, b) (c, d) = (c - a, d - b)
     let scale factor (a, b) = (a * factor, b * factor)
     let opposite = scale -1
+    let expand c (a, b) = a, b, c
 
 
 module String =
