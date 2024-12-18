@@ -54,7 +54,7 @@ module Navigation =
                 if goalReached currentNode.Position goal then
                     let minCost = currentNode.FCost
                     let paths = openSet |> Seq.filter (fun x -> x.FCost = minCost) |> Seq.map reconstructPath |> List.ofSeq
-                    Some (paths, currentNode.GCost)
+                    Some (paths, currentNode.FCost)
                 else
                     openSet.Remove(currentNode) |> ignore
                     closedSet.Add(currentNode.Position) |> ignore
