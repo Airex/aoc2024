@@ -5,10 +5,7 @@ open Utils.Combinators
 open Utils.SampleData
 open Utils
 
-let parseLine =
-    String.words
-    >> Array.map int64
-    >> Pair.fromArray
+let parseLine = String.words >> Array.map int64 >> Pair.fromArray
 
 let readLines =
     String.splitLines
@@ -18,18 +15,12 @@ let readLines =
 
 
 let solution1 data =
-    data
-    |> Pair.map Array.sort
-    ||> Array.zip
-    |> Array.sumBy ((<||) (-) >> abs)
+    data |> Pair.map Array.sort ||> Array.zip |> Array.sumBy ((<||) (-) >> abs)
 
 
-let solution2 data=
+let solution2 data =
     let inline findOrZero y x =
-        y
-        |> Map.tryFind x
-        |> Option.defaultValue 0
-        |> int64
+        y |> Map.tryFind x |> Option.defaultValue 0 |> int64
 
     let inline frequencyMul m = S (*) id (findOrZero m)
 
@@ -37,8 +28,6 @@ let solution2 data=
     |> Pair.fmap2 (id, Array.countBy id >> Map >> frequencyMul)
     ||> flip Array.sumBy
 
-let data =
-    loadSampleData "Puzzle1.txt"
-    |> readLines
+let data = loadSampleData "Puzzle1.txt" |> readLines
 
-run [solution1; solution2] data
+run [ solution1; solution2 ] data

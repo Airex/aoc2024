@@ -9,10 +9,7 @@ let sorter rules a b =
     rules |> List.contains (b, a) |> boolToint 1 -1
 
 let solution1 data =
-    let maps =
-        data
-        |> fst
-        |> List.map (split "|" >> fromArray >> swap)
+    let maps = data |> fst |> List.map (split "|" >> fromArray >> swap)
 
     let cont = flip List.exists maps
 
@@ -25,10 +22,7 @@ let solution1 data =
             (fun acc x ->
                 let lst = acc |> fst
 
-                let valid =
-                    lst
-                    |> List.exists (fun y -> cont ((=) (y, x)))
-                    |> not
+                let valid = lst |> List.exists (fun y -> cont ((=) (y, x))) |> not
 
                 (x :: lst, snd acc && valid))
             (List.empty<string>, true)
@@ -74,10 +68,7 @@ let solution2 data =
                             v.[x] <- b
                             v.[y] <- a
 
-                            idx <-
-                                idx
-                                |> Map.change a (fun _ -> Some y)
-                                |> Map.change b (fun _ -> Some x)
+                            idx <- idx |> Map.change a (fun _ -> Some y) |> Map.change b (fun _ -> Some x)
 
                             t || true
                         | _ -> t || false)
@@ -89,11 +80,7 @@ let solution2 data =
         (changedOverall, v))
 
     |> List.filter fst
-    |> List.sumBy (
-        snd
-        >> (fun x -> Array.get x (Array.length x / 2))
-        >> int
-    )
+    |> List.sumBy (snd >> (fun x -> Array.get x (Array.length x / 2)) >> int)
 
 let solution2_v2 data =
     // Parse the rules into pairs
@@ -112,23 +99,18 @@ let solution2_v2 data =
                     newV.[y] <- a
 
                     let newIdx =
-                        updatedIdx
-                        |> Map.change a (fun _ -> Some y)
-                        |> Map.change b (fun _ -> Some x)
+                        updatedIdx |> Map.change a (fun _ -> Some y) |> Map.change b (fun _ -> Some x)
 
                     (newIdx, newV, true) // Indicate a change occurred
                 | _ -> (updatedIdx, updatedV, hasChanged) // No change
-                )
+            )
             (idx, v, false)
 
     // Recursively reorder the array until no changes occur
     let rec reorder rules idx v =
         let (newIdx, newV, hasChanged) = applySwaps rules idx v
 
-        if hasChanged then
-            reorder rules newIdx newV
-        else
-            newV
+        if hasChanged then reorder rules newIdx newV else newV
 
     // Process updates and directly calculate the sum of middle page numbers
     data
@@ -140,17 +122,13 @@ let solution2_v2 data =
             let reordered = reorder maps initialIdx arr
 
             if reordered <> arr then
-                acc
-                + (reordered.[Array.length reordered / 2] |> int)
+                acc + (reordered.[Array.length reordered / 2] |> int)
             else
                 acc)
         0
 
 let solution2_v3 data =
-    let maps =
-        data
-        |> fst
-        |> List.map (split "|" >> Array.map int >> fromArray)
+    let maps = data |> fst |> List.map (split "|" >> Array.map int >> fromArray)
 
     data
     |> snd
@@ -173,10 +151,4 @@ let data =
             | value -> acc |> fmap2 (id, (fun x -> value :: x)))
         (List.empty<string>, List.empty<string>)
 
-run
-    [ solution1
-      solution1_v2
-      solution2
-      solution2_v2
-      solution2_v3 ]
-    data
+run [ solution1; solution1_v2; solution2; solution2_v2; solution2_v3 ] data

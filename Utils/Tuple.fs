@@ -20,7 +20,7 @@ module Pair =
     let (<**>) (a: 'c * 'd) (b: 'a) = ((fst a) b, (snd a) b)
     let (<*>>) (a: 'c * 'd) (b: 'a * 'b) = ((fst b) (fst a), (snd b) (snd a))
 
-    let (<**>>) (a: 'c * 'd) (b: 'a ) = ((fst b) (a), (snd b) (a))
+    let (<**>>) (a: 'c * 'd) (b: 'a) = ((fst b) (a), (snd b) (a))
 
     let uncurry (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
     let curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)
@@ -105,33 +105,23 @@ module Dir =
 module Array2D =
     let sum (arr: _ array2d) =
         let rec sumHelper i j acc =
-            if i >= Array2D.length1 arr then
-                acc
-            elif j >= Array2D.length2 arr then
-                sumHelper (i + 1) 0 acc
-            else
-                sumHelper i (j + 1) (acc + arr[i, j])
+            if i >= Array2D.length1 arr then acc
+            elif j >= Array2D.length2 arr then sumHelper (i + 1) 0 acc
+            else sumHelper i (j + 1) (acc + arr[i, j])
 
         sumHelper 0 0 0
 
     let findIndex (f: _ -> bool) (arr: _ array2d) =
         let rec findIndexHelper i j =
-            if i >= Array2D.length1 arr then
-                None
-            elif j >= Array2D.length2 arr then
-                findIndexHelper (i + 1) 0
-            elif f arr[i, j] then
-                Some(i, j)
-            else
-                findIndexHelper i (j + 1)
+            if i >= Array2D.length1 arr then None
+            elif j >= Array2D.length2 arr then findIndexHelper (i + 1) 0
+            elif f arr[i, j] then Some(i, j)
+            else findIndexHelper i (j + 1)
 
         findIndexHelper 0 0
 
     let inBounds (arr: _ array2d) x y =
-        x >= 0
-        && y >= 0
-        && x < Array2D.length1 arr
-        && y < Array2D.length2 arr
+        x >= 0 && y >= 0 && x < Array2D.length1 arr && y < Array2D.length2 arr
 
     let windowFold (f: 's -> _ array2d * _ * _ * _ * _ -> 's) (state: 's) (window: _ * _) (arr: _ array2d) =
         let rec foldHelper i j s =
@@ -149,14 +139,10 @@ module Array2D =
         let aw, ah = Array2D.length1 arr, Array2D.length2 arr
 
         let rec containsHelper i j =
-            if i > aw - w then
-                false
-            elif j > ah - h then
-                containsHelper (i + 1) 0
-            elif arr.[i .. i + w, j .. j + h] = m then
-                true
-            else
-                containsHelper i (j + 1)
+            if i > aw - w then false
+            elif j > ah - h then containsHelper (i + 1) 0
+            elif arr.[i .. i + w, j .. j + h] = m then true
+            else containsHelper i (j + 1)
 
         containsHelper 0 0
 
@@ -178,24 +164,12 @@ module Array2D =
         match (x, y) = p with
         | true ->
             match acc with
-            | Some x when
-                (x = char "|" || x = char " ")
-                && (t = Up || t = Down)
-                ->
-                Some '|'
-            | Some x when
-                (x = char "-" || x = char " ")
-                && (t = Left || t = Right)
-                ->
-                Some '-'
+            | Some x when (x = char "|" || x = char " ") && (t = Up || t = Down) -> Some '|'
+            | Some x when (x = char "-" || x = char " ") && (t = Left || t = Right) -> Some '-'
             | Some x when x = char "|" && (t = Left || t = Right) -> Some '+'
             | Some x when x = char "-" && (t = Up || t = Down) -> Some '+'
             | Some x -> Some x
-            | None ->
-                if t = Up || t = Down then
-                    Some '|'
-                else
-                    Some '-'
+            | None -> if t = Up || t = Down then Some '|' else Some '-'
         | _ -> acc
 
     let pathPrinter path get (_: _ array2d) (x, y) =
@@ -281,7 +255,7 @@ module Array2D =
                     (fun acc next ->
                         dfs2_ next stepFunc stopCondition func (visited |> Set.add next)
                         acc // Fold result is ignored as we only process the nodes
-                        )
+                    )
                     ()
             else
                 () // Stop recursion when stop condition is met
@@ -314,5 +288,6 @@ module Permutations =
                         else
                             carry <- false // No carry needed
 
-                if carry then finished <- true // Overflow past the highest value, terminate
+                if carry then
+                    finished <- true // Overflow past the highest value, terminate
         }

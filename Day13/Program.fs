@@ -17,6 +17,7 @@ type Machine =
     { A: int64 * (int64 * int64)
       B: int64 * (int64 * int64)
       Prize: int64 * int64 }
+
     static member Load(arr: _ array) =
         { A = parseLine "+" (arr[0]) |> branch (K 3L) id
           B = parseLine "+" (arr[1]) |> branch (K 1L) id

@@ -18,26 +18,25 @@ let safeCondition arr =
         let neg = if x < 0L then negativeCount + 1 else negativeCount
         (inRange, pos, neg)
 
-    let withinRange, positiveCount, negativeCount =
-        Array.fold folder (true, 0, 0) arr
+    let withinRange, positiveCount, negativeCount = Array.fold folder (true, 0, 0) arr
 
     withinRange && (positiveCount = 0 || negativeCount = 0)
 
 let conditionMatcher = Array.pairwise >> Array.map (uncurry (-)) >> safeCondition
+
 let solution1 data =
     data |> Array.sumBy (conditionMatcher >> zeroOne)
+
 let solution2 data =
     let flippedRemoveAt = flip Array.removeAt
 
     let withOneErrorConditionMatcher x =
         x
         |> Array.indexed
-        |> Array.exists ( fst >> flippedRemoveAt x >> conditionMatcher)
+        |> Array.exists (fst >> flippedRemoveAt x >> conditionMatcher)
 
-    data
-    |> Array.sumBy (withOneErrorConditionMatcher >> zeroOne)
-let data =
-    loadSampleData "Puzzle1.txt"
-    |> readLines
+    data |> Array.sumBy (withOneErrorConditionMatcher >> zeroOne)
 
-run [solution1; solution2] data
+let data = loadSampleData "Puzzle1.txt" |> readLines
+
+run [ solution1; solution2 ] data

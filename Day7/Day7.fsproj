@@ -8,11 +8,11 @@
     <ItemGroup>
         <Compile Include="Program.fs"/>
         <Content Include="Puzzle1.txt" CopyToOutputDirectory="PreserveNewest"/>
-        <Content Include="Puzzle2.txt" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="Puzzle2.txt" CopyToOutputDirectory="PreserveNewest"/>
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Utils\Utils.fsproj" />
+        <ProjectReference Include="..\Utils\Utils.fsproj"/>
     </ItemGroup>
 
 </Project>

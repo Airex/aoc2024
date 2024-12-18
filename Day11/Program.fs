@@ -18,6 +18,7 @@ let countStonesAfterBlinks blinks initialStones =
         | 0 -> 1L
         | _ ->
             let key = (stone, remaining)
+
             match stoneCounts.TryGetValue key with
             | true, count -> count
             | _ ->
@@ -26,8 +27,11 @@ let countStonesAfterBlinks blinks initialStones =
                     | 0L -> calculateStoneCount 1L (remaining - 1)
                     | _ when (stone |> string |> _.Length) % 2 = 0 ->
                         let left, right = splitNumber stone
-                        calculateStoneCount left (remaining - 1) + calculateStoneCount right (remaining - 1)
+
+                        calculateStoneCount left (remaining - 1)
+                        + calculateStoneCount right (remaining - 1)
                     | _ -> calculateStoneCount (stone * 2024L) (remaining - 1)
+
                 stoneCounts.[key] <- count
                 count
 

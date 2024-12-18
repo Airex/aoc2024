@@ -24,12 +24,7 @@ let (|Wall|OpenSpace|Box|LargeBoxLeft|LargeBoxRight|) c =
 
 let toMapAndMoves patch data =
     data
-    |> fmap2 (
-        patch >> array2D,
-        Array.map Array.ofSeq
-        >> Array.collect id
-        >> List.ofArray
-    )
+    |> fmap2 (patch >> array2D, Array.map Array.ofSeq >> Array.collect id >> List.ofArray)
 
 let score t map =
     map
@@ -107,15 +102,11 @@ let solve mapPatch scorer data =
     let map, moves = data |> toMapAndMoves mapPatch
     let _, get = map |> api
 
-    let start =
-        map
-        |> findIndex robot
-        |> Option.defaultValue (-1, -1)
+    let start = map |> findIndex robot |> Option.defaultValue (-1, -1)
 
     map[fst start, snd start] <- '.'
 
-    moveRobot start moves map get
-    |> score scorer
+    moveRobot start moves map get |> score scorer
 
 let scaleMap line =
     line
