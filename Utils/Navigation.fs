@@ -92,3 +92,18 @@ module Navigation =
                     loop ()
 
         loop ()
+
+    type BinarySide = Left | Right
+    let binarySearch min max check =
+        let rec recurse lowerBound upperBound =
+            if lowerBound > upperBound then
+                lowerBound
+            else
+                let midPoint = (upperBound + lowerBound) / 2
+                let midValue = check midPoint
+
+                match midValue with
+                | BinarySide.Left -> recurse lowerBound (midPoint - 1)
+                | BinarySide.Right -> recurse (midPoint + 1) upperBound
+
+        recurse min max

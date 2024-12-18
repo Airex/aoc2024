@@ -37,18 +37,16 @@ let solution1 data =
         |> Set.ofArray
     solve (snd >> string) obstacles |> Option.get
 
-
 let solution2 data =
-    let rec f bytes =
-        let obstacles =
-            data
-            |> Array.take bytes
-            |> Set.ofArray
+    let checkPath bytes =
+        let obstacles = data |> Array.take bytes |> Set.ofArray
         let result = solve (fst >> string) obstacles
         match result with
-        | Some _ -> data |> Array.take (bytes + 1) |> Array.last |> string
-        | None -> f (bytes - 1)
-    f (data |> Array.length)
+        | Some _ -> Right
+        | None -> Left
+
+    let idx = binarySearch 0 ( data |> Array.length ) checkPath
+    data |> Array.item (idx - 1) |> string
 
 
 loadSampleDataLines "Puzzle2.txt"

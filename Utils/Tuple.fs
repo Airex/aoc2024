@@ -44,8 +44,6 @@ module String =
 
     let matches patern input = Regex.Matches(input, patern)
 
-
-
 module Combinators =
     let S f g h x = f (g x) (h x)
     let K x _ = x
