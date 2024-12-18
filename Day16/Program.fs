@@ -2,6 +2,7 @@
 
 open Utils
 open Utils.Array2D
+open Utils.Combinators
 open Utils.Dir
 open Utils.Navigation
 open Utils.Pair
@@ -16,10 +17,7 @@ let aStarOnMap (map: char array2d) start goal goalReached =
 
     let neighbors (x, y, dir) =
         [ Dir.Right; Dir.Left; Dir.Down; Dir.Up ]
-        |> List.map (fun d ->
-            let pos = d |> dirToPair |> add (x, y)
-            fst pos, snd pos, d
-        )
+        |> List.map (S expand id (dirToPair >> add (x, y)))
         |> List.filter isValid
         |> List.map (fun (x,y,d) -> (x,y,d), if d = dir then 1.0 else 1001.0)
 
