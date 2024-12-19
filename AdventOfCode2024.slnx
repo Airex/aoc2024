@@ -1,21 +1,22 @@
 ﻿<Solution>
-    <Project Path="Day10\Day10.fsproj" Type="Classic F#"/>
-    <Project Path="Day11\Day11.fsproj" Type="Classic F#"/>
-    <Project Path="Day12\Day12.fsproj" Type="Classic F#"/>
-    <Project Path="Day13\Day13.fsproj" Type="Classic F#"/>
-    <Project Path="Day14\Day14.fsproj" Type="Classic F#"/>
-    <Project Path="Day15\Day15.fsproj" Type="Classic F#"/>
-    <Project Path="Day16\Day16.fsproj" Type="Classic F#"/>
-    <Project Path="Day17\Day17.fsproj" Type="Classic F#"/>
-    <Project Path="Day18\Day18.fsproj" Type="Classic F#"/>
-    <Project Path="Day1\Day1.fsproj" Type="Classic F#"/>
-    <Project Path="Day2\Day2.fsproj" Type="Classic F#"/>
-    <Project Path="Day3\Day3.fsproj" Type="Classic F#"/>
-    <Project Path="Day4\Day4.fsproj" Type="Classic F#"/>
-    <Project Path="Day5\Day5.fsproj" Type="Classic F#"/>
-    <Project Path="Day6\Day6.fsproj" Type="Classic F#"/>
-    <Project Path="Day7\Day7.fsproj" Type="Classic F#"/>
-    <Project Path="Day8\Day8.fsproj" Type="Classic F#"/>
-    <Project Path="Day9\Day9.fsproj" Type="Classic F#"/>
-    <Project Path="Utils\Utils.fsproj" Type="Classic F#"/>
+  <Project Path="Day10\Day10.fsproj" Type="Classic F#" />
+  <Project Path="Day11\Day11.fsproj" Type="Classic F#" />
+  <Project Path="Day12\Day12.fsproj" Type="Classic F#" />
+  <Project Path="Day13\Day13.fsproj" Type="Classic F#" />
+  <Project Path="Day14\Day14.fsproj" Type="Classic F#" />
+  <Project Path="Day15\Day15.fsproj" Type="Classic F#" />
+  <Project Path="Day16\Day16.fsproj" Type="Classic F#" />
+  <Project Path="Day17\Day17.fsproj" Type="Classic F#" />
+  <Project Path="Day18\Day18.fsproj" Type="Classic F#" />
+  <Project Path="Day19\Day19.fsproj" Type="Classic F#" />
+  <Project Path="Day1\Day1.fsproj" Type="Classic F#" />
+  <Project Path="Day2\Day2.fsproj" Type="Classic F#" />
+  <Project Path="Day3\Day3.fsproj" Type="Classic F#" />
+  <Project Path="Day4\Day4.fsproj" Type="Classic F#" />
+  <Project Path="Day5\Day5.fsproj" Type="Classic F#" />
+  <Project Path="Day6\Day6.fsproj" Type="Classic F#" />
+  <Project Path="Day7\Day7.fsproj" Type="Classic F#" />
+  <Project Path="Day8\Day8.fsproj" Type="Classic F#" />
+  <Project Path="Day9\Day9.fsproj" Type="Classic F#" />
+  <Project Path="Utils\Utils.fsproj" Type="Classic F#" />
 </Solution>
