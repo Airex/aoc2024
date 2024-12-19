@@ -108,7 +108,7 @@ module Navigation =
     let binarySearch min max check =
         let rec recurse lowerBound upperBound =
             if lowerBound > upperBound then
-                lowerBound
+                (upperBound + lowerBound) / 2
             else
                 let midPoint = (upperBound + lowerBound) / 2
                 let midValue = check midPoint

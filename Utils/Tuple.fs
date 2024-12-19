@@ -3,6 +3,7 @@
 open System
 open System.Collections.Generic
 open System.Text.RegularExpressions
+open Microsoft.FSharp.Core
 
 module Pair =
     let fromArray (a: 'a array) = (a[0], a[1])
@@ -30,6 +31,16 @@ module Pair =
     let scale factor (a, b) = (a * factor, b * factor)
     let opposite = scale -1
     let expand c (a, b) = a, b, c
+
+[<RequireQualifiedAccess>]
+module Box =
+    let fromPair (a: 'a * 'a) = (0, 0), a
+
+    let contains (a: 'a * 'a) b =
+        let x1, y1 = fst b
+        let x2, y2 = snd b
+        let x, y = a
+        x >= x1 && x <= x2 && y >= y1 && y <= y2
 
 
 module String =

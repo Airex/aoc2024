@@ -9,18 +9,14 @@ open Utils.String
 
 let aStarOnMap (size: int * int) (obstacles: Set<int * int>) start goal goalReached =
     let isValid (x, y) =
-        x >= 0
-        && x <= fst size
-        && y >= 0
-        && y <= snd size
+        size |> Box.fromPair |> Box.contains (x, y)
         && not (obstacles |> Set.contains (x, y))
 
     let neighbors (x, y) =
         [ Dir.Right; Dir.Left; Dir.Down; Dir.Up ]
         |> List.map (dirToPair >> add (x, y))
-        |> List.map id
         |> List.filter isValid
-        |> List.map (fun (x, y) -> (x, y), 1.0)
+        |> List.map (fun pos -> pos, 1.0)
 
     let manhattanDistance (a: int * int) (b: int * int) =
         abs (fst a - fst b) + abs (snd a - snd b) |> float
@@ -45,8 +41,9 @@ let solution2 data =
         | Some _ -> Right
         | None -> Left
 
-    let idx = binarySearch 0 (data |> Array.length) checkPath
-    data |> Array.item (idx - 1) |> string
+    binarySearch 0 (data |> Array.length) checkPath
+    |> flip Array.item data
+    |> string
 
 
 loadSampleDataLines "Puzzle2.txt"
