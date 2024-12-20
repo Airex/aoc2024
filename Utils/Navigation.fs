@@ -1,6 +1,7 @@
 namespace Utils
 
 open System.Collections.Generic
+open Microsoft.FSharp.Core
 
 /// Represents a node in the graph.
 type Node<'T> =
@@ -11,7 +12,9 @@ type Node<'T> =
       Parent: Node<'T> option } // Parent node in the path
 
 module Navigation =
-    /// A* algorithm implementation
+    /// A* al
+    /// gorithm implementation
+    [<TailCall>]
     let aStar
         (start: 'T)
         (goal: 'T)
@@ -42,6 +45,7 @@ module Navigation =
                 | None -> List.rev (node.Position :: lst)
 
             f node []
+
 
         let rec loop () =
             if openSet.Count = 0 then
@@ -118,3 +122,54 @@ module Navigation =
                 | BinarySide.Right -> recurse (midPoint + 1) upperBound
 
         recurse min max
+
+    type PriorityQueueComparer<'T when 'T: comparison>() =
+        interface IComparer<'T * int> with
+            member _.Compare((a, d1), (b, d2)) =
+                if d1 <> d2 then compare d1 d2 else compare a b
+
+    let dijkstra (getNeighbors: 'T -> ('T * int) list) (start: 'T) (goal: 'T) =
+        let distances = Dictionary<'T, int>()
+        let previousNodes = Dictionary<'T, 'T option>()
+        let priorityQueue = SortedSet<'T * int>(PriorityQueueComparer<'T>())
+
+        // Ініціалізація
+        distances.[start] <- 0
+        previousNodes.[start] <- None
+        priorityQueue.Add((start, 0)) |> ignore
+
+        // Змінна для відстеження завершення
+        let mutable goalReached = false
+
+        while priorityQueue.Count > 0 && not goalReached do
+            // Вибираємо вузол з найменшою відстанню
+            let (currentNode, _) = priorityQueue.Min
+            priorityQueue.Remove(priorityQueue.Min) |> ignore
+
+            // Якщо поточний вузол є ціллю, завершуємо цикл
+            if currentNode = goal then
+                goalReached <- true
+            else
+                // Отримуємо сусідів через функцію
+                let neighbors = getNeighbors currentNode
+
+                for (neighbor, weight) in neighbors do
+                    let alt = distances.[currentNode] + weight
+
+                    if not (distances.ContainsKey(neighbor)) || alt < distances.[neighbor] then
+                        if distances.ContainsKey(neighbor) then
+                            priorityQueue.Remove((neighbor, distances.[neighbor])) |> ignore
+
+                        distances.[neighbor] <- alt
+                        previousNodes.[neighbor] <- Some currentNode
+                        priorityQueue.Add((neighbor, alt)) |> ignore
+
+        // Повертаємо відстані та шлях до цілі
+        // Відновлення шляху
+        let rec reconstructPath currentNode path =
+            match previousNodes.TryGetValue(currentNode) with
+            | true, Some prev -> reconstructPath prev (currentNode :: path)
+            | true, None -> currentNode :: path
+            | _ -> path
+
+        if goalReached then Some(reconstructPath goal []) else None
