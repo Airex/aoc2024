@@ -56,6 +56,7 @@ module String =
 
     let matches patern input = Regex.Matches(input, patern)
 
+
 module Combinators =
     let inline S f g h x = f (g x) (h x)
     let inline K x _ = x
@@ -113,6 +114,21 @@ module Dir =
         | Right -> (0, 1)
         | _ -> failwith "todo"
 
+    let pairToDir =
+        function
+        | (-1, 0) -> Up
+        | (1, 0) -> Down
+        | (0, -1) -> Left
+        | (0, 1) -> Right
+        | _ -> failwith "todo"
+
+    let dirToChar =
+        function
+        | Up -> '^'
+        | Down -> 'v'
+        | Left -> '<'
+        | Right -> '>'
+        | _ -> failwith "todo"
 
 module Array2D =
     let sum (arr: _ array2d) =
