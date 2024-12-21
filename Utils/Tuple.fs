@@ -9,28 +9,29 @@ module Pair =
     let fromArray (a: 'a array) = (a[0], a[1])
     let fromList (a: 'a list) = (List.head a, List.head (List.tail a))
 
-    let makePair (a: 'a) = (a, a)
-    let map (f: 'a -> 'b) (a: 'a * 'a) = (f (fst a), f (snd a))
-    let map2 (f: 'a -> 'b -> 'c) (g: 'a -> 'b -> 'd) (a: 'a * 'b) = f (fst a) (snd a), g (fst a) (snd a)
-    let fmap2 (a: ('a -> 'c) * ('b -> 'd)) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
-    let fmap (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
-    let swap (a: 'a * 'b) = (snd a, fst a)
-    let apply (a: 'c * 'd) (b: 'a * 'b) = ((fst b) (fst a), (snd b) (snd a))
-    let fapply (a: 'c -> 'd) (b: 'a * 'b) (c: 'e * 'f) = a ((fst b) (fst c)) ((snd b) (snd c))
+    let inline makePair (a: 'a) = (a, a)
+    let inline pair a b = (a, b)
+    let inline map (f: 'a -> 'b) (a: 'a * 'a) = (f (fst a), f (snd a))
+    let inline map2 (f: 'a -> 'b -> 'c) (g: 'a -> 'b -> 'd) (a: 'a * 'b) = f (fst a) (snd a), g (fst a) (snd a)
+    let inline fmap2 (a: ('a -> 'c) * ('b -> 'd)) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
+    let inline fmap (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
+    let inline swap (a: 'a * 'b) = (snd a, fst a)
+    let inline apply (a: 'c * 'd) (b: 'a * 'b) = ((fst b) (fst a), (snd b) (snd a))
+    let inline fapply (a: 'c -> 'd) (b: 'a * 'b) (c: 'e * 'f) = a ((fst b) (fst c)) ((snd b) (snd c))
     let (<*>) (a: 'c * 'd) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
     let (<**>) (a: 'c * 'd) (b: 'a) = ((fst a) b, (snd a) b)
     let (<*>>) (a: 'c * 'd) (b: 'a * 'b) = ((fst b) (fst a), (snd b) (snd a))
 
     let (<**>>) (a: 'c * 'd) (b: 'a) = ((fst b) (a), (snd b) (a))
 
-    let uncurry (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
-    let curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)
-    let branch (f: 'a -> 'b) (g: 'a -> 'c) (a: 'a) = (f a, g a)
-    let add (a, b) (c, d) = (a + c, b + d)
-    let sub (a, b) (c, d) = (c - a, d - b)
-    let scale factor (a, b) = (a * factor, b * factor)
+    let inline uncurry (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
+    let inline curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)
+    let inline branch (f: 'a -> 'b) (g: 'a -> 'c) (a: 'a) = (f a, g a)
+    let inline add (a, b) (c, d) = (a + c, b + d)
+    let inline sub (a, b) (c, d) = (c - a, d - b)
+    let inline scale factor (a, b) = (a * factor, b * factor)
     let opposite = scale -1
-    let expand c (a, b) = a, b, c
+    let inline expand c (a, b) = a, b, c
 
 [<RequireQualifiedAccess>]
 module Box =
@@ -56,13 +57,13 @@ module String =
     let matches patern input = Regex.Matches(input, patern)
 
 module Combinators =
-    let S f g h x = f (g x) (h x)
-    let K x _ = x
-    let C f x y = f y x
-    let B f g x = f (g x)
-    let W f x = f x x
-    let I x = x
-    let T x y = y x
+    let inline S f g h x = f (g x) (h x)
+    let inline K x _ = x
+    let inline C f x y = f y x
+    let inline B f g x = f (g x)
+    let inline W f x = f x x
+    let inline I x = x
+    let inline T x y = y x
 
 type Dir =
     | Unknown
@@ -188,9 +189,10 @@ module Array2D =
         | Some x -> x
         | _ -> get (x, y)
 
-    let api grid =
+    let inline api grid =
         (Pair.uncurry (inBounds grid), Pair.uncurry (Array2D.get grid))
 
+    let size (arr: _ array2d) = Array2D.length1 arr, Array2D.length2 arr
 
     // Generic BFS
     let bfs (start: 'a) (stepFunc: 'a -> seq<'a>) (stopCondition: 'a -> bool) (aFunc: 'a -> unit) =

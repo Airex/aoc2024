@@ -1,80 +1,69 @@
 ﻿module Day20
 
-open System.Collections.Generic
+open System.Linq
+open FSharp.Collections.ParallelSeq
 open Utils.Array2D
+open Utils.Combinators
 open Utils.Navigation
 open Utils.Pair
 open Utils.SampleData
 
-let neigbors (x, y) =
+let inline neigbors (x, y) =
     [ (x + 1, y); (x - 1, y); (x, y + 1); (x, y - 1) ]
 
-let distance (x1, y1) (x2, y2) = abs (x1 - x2) + abs (y1 - y2)
+let inline distance (x1, y1) (x2, y2) = abs (x1 - x2) + abs (y1 - y2)
 
-let aStarOnMap (grid: char array2d) start goal =
-    let isValid ((x, y)) = inBounds grid x y && grid[x, y] <> '#'
-
-    let neighbors (x, y) =
-        (x, y)
-        |> neigbors
-        |> Seq.filter isValid
-        |> Seq.map (fun pos -> pos, 1)
-        |> List.ofSeq
-
+let findPath inBounds get start goal =
+    let isValid = S (&&) inBounds (get >> (<>) '#')
+    let neighbors = neigbors >> List.filter isValid >> List.map (fun pos -> pos, 1)
     dijkstra neighbors start goal
 
-let getReachablePoints (n: int) (start: int * int) : Set<int * int> =
-    // Directions for movement (horizontal, vertical, diagonal)
-    let directions = [ (1, 0); (-1, 0); (0, 1); (0, -1) ] // Horizontal and vertical
+let inline getReachablePoints gridSize get n (start: int * int) =
+    seq {
+        let maxX, maxY = gridSize
+        let startX, startY = start
 
-    // BFS to explore all reachable points
-    let visited = HashSet<int * int>()
-    let queue = Queue<(int * int) * int>()
+        // Constrain dx to valid x-range
+        for dx in max -n (-startX) .. min n (maxX - startX - 1) do
+            let y = n - abs dx
 
-    // Start with the initial point
-    queue.Enqueue((start, 0))
-    visited.Add(start) |> ignore
+            // Constrain dy to valid y-range
+            for dy in max -y (-startY) .. min y (maxY - startY - 1) do
+                let pos = add start (dx, dy)
 
-    while queue.Count > 0 do
-        let current, steps = queue.Dequeue()
+                if get pos <> '#' then
+                    let dist = distance start pos
 
-        if steps < n then
-            for dx, dy in directions do
-                let nextPoint = fst current + dx, snd current + dy
-
-                if not (visited.Contains(nextPoint)) then
-                    visited.Add(nextPoint) |> ignore
-                    queue.Enqueue((nextPoint, steps + 1))
-
-    visited |> Set.ofSeq
+                    if dist > 0 && dist <= n && get pos <> '#' then
+                        yield pos, dist
+    }
 
 let solve cheetLength minCheetWin data =
+    let inBounds, get = data |> api
+    let size = size data
     let start = findIndex (fun c -> c = 'S') data |> Option.get
     let goal = findIndex (fun c -> c = 'E') data |> Option.get
 
-    let race start = aStarOnMap data start goal
-    let cache = race start |> Option.get |> List.mapi (fun i x -> x, i) |> Map
+    let race start = findPath inBounds get start goal
+    let path = race start |> Option.get
+    let cache = path |> Seq.mapi (flip pair) |> dict
 
-    let racePosition start =
-        cache |> Map.tryFind start |> Option.defaultValue -1
+    let inline racePosition start = cache[start]
 
-    let getAvailableCheets n pos =
+    let inline getAvailableCheets n pos =
+        (n, pos) ||> getReachablePoints size get |> Seq.map (fmap2 (racePosition, id))
+
+    let inline countCheets pos =
+        let i = racePosition pos
+        let cheatWin = uncurry (-) >> flip (-) i
+
         pos
-        |> getReachablePoints n
-        |> Seq.filter (fun (x, y) -> inBounds data x y && data[x, y] <> '#')
-        |> Seq.map (branch racePosition (distance pos))
-
-    race start
-    |> Option.get
-    |> Seq.collect (fun (x, y) ->
-        let i = racePosition (x, y)
-
-        (x, y)
         |> getAvailableCheets cheetLength
-        |> Seq.map (fun (r, d) -> r - i - d)
-        |> Seq.filter (fun x -> x >= minCheetWin))
-    |> Seq.length
+        |> Seq.map cheatWin
+        |> Seq.filter ((<=) minCheetWin)
+        |> Seq.length
 
+    path |> PSeq.sumBy countCheets
 
 let solution1 = solve 2 100
 let solution2 = solve 20 100
