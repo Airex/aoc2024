@@ -9,7 +9,7 @@ open Utils.String
 
 let aStarOnMap (size: int * int) (obstacles: Set<int * int>) start goal goalReached =
     let isValid (x, y) =
-        size |> Box.fromPair |> Box.contains (x, y)
+        size |> Box.ofSize |> Box.contains (x, y)
         && not (obstacles |> Set.contains (x, y))
 
     let neighbors (x, y) =

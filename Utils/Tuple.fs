@@ -16,17 +16,16 @@ module Pair =
     let inline fmap2 (a: ('a -> 'c) * ('b -> 'd)) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
     let inline fmap (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
     let inline swap (a: 'a * 'b) = (snd a, fst a)
-    let inline apply (a: 'c * 'd) (b: 'a * 'b) = ((fst b) (fst a), (snd b) (snd a))
-    let inline fapply (a: 'c -> 'd) (b: 'a * 'b) (c: 'e * 'f) = a ((fst b) (fst c)) ((snd b) (snd c))
+    let inline apply (a: 'c * 'd) (b: ('c -> 'e) * ('d -> 'f)) = ((fst b) (fst a), (snd b) (snd a))
+    let inline fapply (a: 'c -> 'd) (b: ('a -> 'g) * ('f -> 'h)) (c: 'e * 'f) = a ((fst b) (fst c)) ((snd b) (snd c))
     let (<*>) (a: 'c * 'd) (b: 'a * 'b) = ((fst a) (fst b), (snd a) (snd b))
-    let (<**>) (a: 'c * 'd) (b: 'a) = ((fst a) b, (snd a) b)
+    let (<**>) (a: ('a -> 'b) * ('a -> 'b)) (b: 'a) = ((fst a) b, (snd a) b)
     let (<*>>) (a: 'c * 'd) (b: 'a * 'b) = ((fst b) (fst a), (snd b) (snd a))
-
-    let (<**>>) (a: 'c * 'd) (b: 'a) = ((fst b) (a), (snd b) (a))
 
     let inline uncurry (f: 'a -> 'b -> 'c) (a: 'a * 'b) = f (fst a) (snd a)
     let inline curry (f: 'a * 'b -> 'c) (a: 'a) (b: 'b) = f (a, b)
     let inline branch (f: 'a -> 'b) (g: 'a -> 'c) (a: 'a) = (f a, g a)
+    let (-<) = branch
     let inline add (a, b) (c, d) = (a + c, b + d)
     let inline sub (a, b) (c, d) = (c - a, d - b)
     let inline scale factor (a, b) = (a * factor, b * factor)
@@ -35,7 +34,7 @@ module Pair =
 
 [<RequireQualifiedAccess>]
 module Box =
-    let fromPair (a: 'a * 'a) = (0, 0), a
+    let ofSize (a: 'a * 'a) = (0, 0), a
 
     let contains (a: 'a * 'a) b =
         let x1, y1 = fst b
@@ -208,7 +207,8 @@ module Array2D =
     let inline api grid =
         (Pair.uncurry (inBounds grid), Pair.uncurry (Array2D.get grid))
 
-    let size (arr: _ array2d) = Array2D.length1 arr, Array2D.length2 arr
+    let size (arr: _ array2d) =
+        Array2D.length1 arr, Array2D.length2 arr
 
     // Generic BFS
     let bfs (start: 'a) (stepFunc: 'a -> seq<'a>) (stopCondition: 'a -> bool) (aFunc: 'a -> unit) =
