@@ -4,19 +4,19 @@ open System.Collections.Generic
 open Utils.Pair
 open Utils.SampleData
 
-let div32 (x: int64) = x >>> 5
-let mul64 (x: int64) = x <<< 6
-let mul2048 (x: int64) = x <<< 11
-let mix (x: int64) (y: int64) = x ^^^ y
-let prune (x: int64) = x % 16777216L
+let inline div32 (x: int64) = x >>> 5
+let inline mul64 (x: int64) = x <<< 6
+let inline mul2048 (x: int64) = x <<< 11
+let inline mix (x: int64) (y: int64) = x ^^^ y
+let inline prune (x: int64) = x &&& 0xFFFFFF
 
-let op1 x = mul64 x |> mix x |> prune
-let op2 x = div32 x |> mix x |> prune
-let op3 x = mul2048 x |> mix x |> prune
+let inline op1 x = mul64 x |> mix x |> prune
+let inline op2 x = div32 x |> mix x |> prune
+let inline op3 x = mul2048 x |> mix x |> prune
 let secret = op1 >> op2 >> op3
-let lastDigit (x: int64) = x % 10L |> int
+let inline lastDigit (x: int64) = x % 10L |> int
 
-let encode (lst: int list) =
+let inline encode (lst: int list) =
     let shift x = x + 9
     let base19 = 19
 
