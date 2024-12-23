@@ -13,6 +13,7 @@
   <Project Path="Day20\Day20.fsproj" Type="Classic F#" />
   <Project Path="Day21\Day21.fsproj" Type="Classic F#" />
   <Project Path="Day22\Day22.fsproj" Type="Classic F#" />
+  <Project Path="Day23\Day23.fsproj" Type="Classic F#" />
   <Project Path="Day2\Day2.fsproj" Type="Classic F#" />
   <Project Path="Day3\Day3.fsproj" Type="Classic F#" />
   <Project Path="Day4\Day4.fsproj" Type="Classic F#" />
